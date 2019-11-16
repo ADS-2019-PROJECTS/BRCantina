@@ -6,16 +6,35 @@
 
 package br.com.cruzeiro.ads.brcantina.views;
 
+import br.com.cruzeiro.ads.brcantina.controllers.UserController;
+import br.com.cruzeiro.ads.brcantina.controllers.interfaces.IUserController;
+import br.com.cruzeiro.ads.brcantina.exceptions.RequiredFieldException;
+import br.com.cruzeiro.ads.brcantina.models.Usuario;
+import br.com.cruzeiro.ads.brcantina.models.enums.TipoUsuario;
+import br.com.cruzeiro.ads.brcantina.validations.Validator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author jose.antonio
  */
 public class NovoColaboradorJFrame extends javax.swing.JDialog {
 
+    /* CONTROLLERS */
+    private IUserController mUserController;
+    
     /** Creates new form CadastroUsuarioJFrame */
     public NovoColaboradorJFrame() {
         this.setModal(true);
         initComponents();
+        this.initControllers();
+        this.getRootPane().setDefaultButton(btnSalvar);
+    }
+    
+    private void initControllers() {
+        this.mUserController = new UserController();
     }
 
     /** This method is called from within the constructor to
@@ -33,6 +52,12 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
         txtNome = new javax.swing.JTextField();
         lblFonePrincipal = new javax.swing.JLabel();
         txtFonePrincipal = new javax.swing.JTextField();
+        try{
+            javax.swing.text.MaskFormatter data= new javax.swing.text.MaskFormatter("(##)#####-####");
+            txtFonePrincipal = new javax.swing.JFormattedTextField(data);
+        }catch (Exception e){
+
+        }
         lblEmail = new javax.swing.JLabel();
         txtEmail = new javax.swing.JTextField();
         checkPermitirAcesso = new javax.swing.JCheckBox();
@@ -44,9 +69,7 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
         txtLogin = new javax.swing.JTextField();
         lblDicaLogin = new javax.swing.JLabel();
         lblSenha = new javax.swing.JLabel();
-        lblRepeatSenha = new javax.swing.JLabel();
         txtSenha = new javax.swing.JPasswordField();
-        txtRepeatSenha = new javax.swing.JPasswordField();
         lblDicaSenha = new javax.swing.JLabel();
         checkUsuarioAtivo = new javax.swing.JCheckBox();
         btnVoltar = new javax.swing.JButton();
@@ -57,9 +80,9 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
 
         paneInformacoes.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
 
-        lblNome.setText("Nome");
+        lblNome.setText("<html><body><span>Nome<span style='color:red;'>*</span></span></body></html>");
 
-        lblFonePrincipal.setText("Fone Principal");
+        lblFonePrincipal.setText("<html><body><span>Fone Principal<span style='color:red;'>*</span></span></body></html>");
 
         txtFonePrincipal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -69,11 +92,13 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
 
         lblEmail.setText("E-Mail");
 
+        checkPermitirAcesso.setSelected(true);
         checkPermitirAcesso.setText("Permitir que essa pessoa acesse o programa");
 
         paneTipoUsuario.setBorder(javax.swing.BorderFactory.createEtchedBorder());
 
         buttonGroupTipoUsuario.add(rdAdministrador);
+        rdAdministrador.setSelected(true);
         rdAdministrador.setText("Administrador (acesso total ao programa)");
 
         buttonGroupTipoUsuario.add(rdAtendente);
@@ -88,7 +113,7 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
                 .addGroup(paneTipoUsuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(rdAdministrador)
                     .addComponent(rdAtendente))
-                .addContainerGap(80, Short.MAX_VALUE))
+                .addContainerGap(76, Short.MAX_VALUE))
         );
         paneTipoUsuarioLayout.setVerticalGroup(
             paneTipoUsuarioLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -102,16 +127,15 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
 
         lblTipo.setText("Tipo");
 
-        lblLogin.setText("Login:");
+        lblLogin.setText("<html><body><span>Login<span style='color:red;'>*</span></span></body></html>:");
 
         lblDicaLogin.setText("(Até 20 dígitos)");
 
-        lblSenha.setText("Senha:");
-
-        lblRepeatSenha.setText("Confirmar Senha:");
+        lblSenha.setText("<html><body><span>Senha<span style='color:red;'>*</span></span></body></html>:");
 
         lblDicaSenha.setText("(Até 12 dígitos)");
 
+        checkUsuarioAtivo.setSelected(true);
         checkUsuarioAtivo.setText("Usuário Ativo");
 
         javax.swing.GroupLayout paneInformacoesLayout = new javax.swing.GroupLayout(paneInformacoes);
@@ -121,40 +145,33 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
             .addGroup(paneInformacoesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblSenha)
-                    .addComponent(lblLogin)
-                    .addComponent(lblFonePrincipal)
-                    .addComponent(lblNome)
+                    .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblFonePrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblTipo))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(paneInformacoesLayout.createSequentialGroup()
-                        .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(txtLogin, javax.swing.GroupLayout.PREFERRED_SIZE, 141, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, 106, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(paneInformacoesLayout.createSequentialGroup()
-                                .addComponent(lblDicaLogin)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(paneInformacoesLayout.createSequentialGroup()
-                                .addComponent(lblRepeatSenha)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txtRepeatSenha))))
                     .addComponent(txtNome)
                     .addComponent(checkPermitirAcesso, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(paneTipoUsuario, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addGroup(paneInformacoesLayout.createSequentialGroup()
-                        .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(checkUsuarioAtivo)
-                            .addComponent(lblDicaSenha))
-                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(paneInformacoesLayout.createSequentialGroup()
                         .addComponent(txtFonePrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(lblEmail)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txtEmail)))
+                        .addComponent(txtEmail))
+                    .addGroup(paneInformacoesLayout.createSequentialGroup()
+                        .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(checkUsuarioAtivo)
+                            .addComponent(lblDicaSenha)
+                            .addGroup(paneInformacoesLayout.createSequentialGroup()
+                                .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(txtLogin, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
+                                    .addComponent(txtSenha))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblDicaLogin)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         paneInformacoesLayout.setVerticalGroup(
@@ -162,15 +179,15 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
             .addGroup(paneInformacoesLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblNome)
+                    .addComponent(lblNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtNome, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblFonePrincipal)
+                    .addComponent(lblFonePrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtFonePrincipal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblEmail)
                     .addComponent(txtEmail, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(65, 65, 65)
+                .addGap(41, 41, 41)
                 .addComponent(checkPermitirAcesso)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -178,25 +195,33 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
                     .addComponent(paneTipoUsuario, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(16, 16, 16)
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblLogin)
+                    .addComponent(lblLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(txtLogin, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblDicaLogin))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(paneInformacoesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblSenha)
-                    .addComponent(lblRepeatSenha)
-                    .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txtRepeatSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(lblSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txtSenha, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(lblDicaSenha)
                 .addGap(18, 18, 18)
                 .addComponent(checkUsuarioAtivo)
-                .addContainerGap(10, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         btnVoltar.setText("Voltar");
+        btnVoltar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoltarActionPerformed(evt);
+            }
+        });
 
         btnSalvar.setText("Salvar");
+        btnSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSalvarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -232,6 +257,35 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
     private void txtFonePrincipalActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtFonePrincipalActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtFonePrincipalActionPerformed
+
+    private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnVoltarActionPerformed
+
+    private void btnSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSalvarActionPerformed
+        Usuario u = new Usuario();
+        u.setNome(txtNome.getText());
+        u.setEmail(txtEmail.getText());
+        u.setFone(txtFonePrincipal.getText());
+        u.setTemAcessoAoSistema(checkPermitirAcesso.isSelected());
+        u.setTipoUsuario(TipoUsuario.ADMINISTRADOR);
+        u.setLogin(txtLogin.getText());
+        u.setSenha(String.valueOf(txtSenha.getPassword()));
+        u.setAtivo(checkUsuarioAtivo.isSelected());
+        
+        try {
+            if(Validator.validateForNulls(u)) {
+                this.mUserController.cadastrar(u);
+                JOptionPane.showMessageDialog(rootPane, "Usuario criado com sucesso!");
+                this.dispose();
+            }
+        } catch (RequiredFieldException ex) {
+            Logger.getLogger(NovoColaboradorJFrame.class.getName()).log(Level.SEVERE, null, ex);
+            ex.notifyUserWithToast();
+        } catch (IllegalAccessException ex) {
+            Logger.getLogger(NovoColaboradorJFrame.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_btnSalvarActionPerformed
 
     /**
      * @param args the command line arguments
@@ -281,7 +335,6 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
     private javax.swing.JLabel lblFonePrincipal;
     private javax.swing.JLabel lblLogin;
     private javax.swing.JLabel lblNome;
-    private javax.swing.JLabel lblRepeatSenha;
     private javax.swing.JLabel lblSenha;
     private javax.swing.JLabel lblTipo;
     private javax.swing.JPanel paneInformacoes;
@@ -292,7 +345,6 @@ public class NovoColaboradorJFrame extends javax.swing.JDialog {
     private javax.swing.JTextField txtFonePrincipal;
     private javax.swing.JTextField txtLogin;
     private javax.swing.JTextField txtNome;
-    private javax.swing.JPasswordField txtRepeatSenha;
     private javax.swing.JPasswordField txtSenha;
     // End of variables declaration//GEN-END:variables
 

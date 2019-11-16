@@ -5,12 +5,17 @@
  */
 package br.com.cruzeiro.ads.brcantina.views;
 
+import org.apache.log4j.Logger;
+
 /**
  *
  * @author jose.antonio
  */
 public class NovoClienteJFrame extends javax.swing.JDialog {
 
+    static Logger log = Logger.getLogger(
+                      NovoClienteJFrame.class.getName());
+    
     /**
      * Creates new form NovoClienteJFrame
      */
@@ -33,6 +38,12 @@ public class NovoClienteJFrame extends javax.swing.JDialog {
         txtCodigo = new javax.swing.JTextField();
         txtNome = new javax.swing.JTextField();
         txtDocumento = new javax.swing.JTextField();
+        try{
+            javax.swing.text.MaskFormatter data= new javax.swing.text.MaskFormatter("##.###.###/####-##");
+            txtDocumento = new javax.swing.JFormattedTextField(data);
+        }
+        catch (Exception e){
+        }
         lblDocumento = new javax.swing.JLabel();
         lblNome = new javax.swing.JLabel();
         lblFone = new javax.swing.JLabel();
@@ -41,6 +52,12 @@ public class NovoClienteJFrame extends javax.swing.JDialog {
         txtCelular = new javax.swing.JTextField();
         lblEnderecoPrincipal = new javax.swing.JLabel();
         txtCep = new javax.swing.JTextField();
+        try{
+            javax.swing.text.MaskFormatter data= new javax.swing.text.MaskFormatter("#####-###");
+            txtCep = new javax.swing.JFormattedTextField(data);
+        }catch (Exception e){
+            log.error(e);
+        }
         lblCep = new javax.swing.JLabel();
         txtEndereco = new javax.swing.JTextField();
         lblNumero = new javax.swing.JLabel();
@@ -65,6 +82,7 @@ public class NovoClienteJFrame extends javax.swing.JDialog {
         btnVoltar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setTitle("Novo Cliente");
 
         paneGeral.setBorder(javax.swing.BorderFactory.createTitledBorder("Geral"));
 
@@ -246,6 +264,11 @@ public class NovoClienteJFrame extends javax.swing.JDialog {
         btnSalvar.setText("Salvar");
 
         btnVoltar.setText("Voltar");
+        btnVoltar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnVoltarActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -277,6 +300,10 @@ public class NovoClienteJFrame extends javax.swing.JDialog {
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
+        this.dispose();
+    }//GEN-LAST:event_btnVoltarActionPerformed
 
     /**
      * @param args the command line arguments

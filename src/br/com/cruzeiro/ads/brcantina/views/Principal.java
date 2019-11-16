@@ -5,6 +5,11 @@
  */
 package br.com.cruzeiro.ads.brcantina.views;
 
+import br.com.cruzeiro.ads.brcantina.controllers.UserController;
+import br.com.cruzeiro.ads.brcantina.dao.UsuarioDAO;
+import br.com.cruzeiro.ads.brcantina.dao.interfaces.IUsuarioDAO;
+import br.com.cruzeiro.ads.brcantina.database.DataBase;
+import br.com.cruzeiro.ads.brcantina.exceptions.ExceptionsHandler;
 import br.com.cruzeiro.ads.brcantina.utils.InternalFrameUtils;
 import br.com.cruzeiro.ads.brcantina.views.internalframe.CaixaInterFrame;
 import br.com.cruzeiro.ads.brcantina.views.internalframe.CategoriaProdutoInterFrame;
@@ -15,13 +20,18 @@ import br.com.cruzeiro.ads.brcantina.views.internalframe.ContasReceberInterFrame
 import br.com.cruzeiro.ads.brcantina.views.internalframe.FornecedoresInterFrame;
 import br.com.cruzeiro.ads.brcantina.views.internalframe.HistoricoPedidosInterFrame;
 import br.com.cruzeiro.ads.brcantina.views.internalframe.ProdutosInterFrame;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import javax.swing.JOptionPane;
+import org.apache.log4j.Logger;
 
-/**
- *
- * @author jose.antonio
- */
 public class Principal extends javax.swing.JFrame {
 
+    static Logger log = Logger.getLogger(
+                      Principal.class.getName());
+    
     private ColaboradoresIternFrame mColaboradoresIternFrame;
     private ClientesIternFrame mClientesIternFrame;
     private ProdutosInterFrame mProdutosInterFrame;
@@ -32,12 +42,21 @@ public class Principal extends javax.swing.JFrame {
     private ContasPagarInterFrame mContasPagarInterFrame;
     private ContasReceberInterFrame mContasReceberInterFrame;
     
+    
+    /*CONTROLLERS*/
+    private UserController mUserController;
+    
     /**
      * Creates new form Principal
      */
     public Principal() {
+        log.info("Init View Principal");
+        
+        Thread.setDefaultUncaughtExceptionHandler(new ExceptionsHandler());
+        
         initComponents();
         initObjetos();
+        initControllers();
     }
     
     private void initObjetos() {
@@ -50,6 +69,10 @@ public class Principal extends javax.swing.JFrame {
         mFornecedoresInterFrame = new FornecedoresInterFrame();
         mContasPagarInterFrame = new ContasPagarInterFrame();
         mContasReceberInterFrame = new ContasReceberInterFrame();
+    }
+    
+    private void initControllers() {
+        this.mUserController = new UserController();
     }
 
     /**
@@ -66,6 +89,7 @@ public class Principal extends javax.swing.JFrame {
         menuOptions = new javax.swing.JMenuBar();
         menuPrincipal = new javax.swing.JMenu();
         menuItemAbrirFecharCaixa = new javax.swing.JMenuItem();
+        menuItemPedidoCaixa = new javax.swing.JMenuItem();
         menuItemClientes = new javax.swing.JMenuItem();
         menuItemHistoricoPedidos = new javax.swing.JMenuItem();
         menuItemSair = new javax.swing.JMenuItem();
@@ -88,6 +112,14 @@ public class Principal extends javax.swing.JFrame {
         jMenu3.setText("jMenu3");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            public void windowActivated(java.awt.event.WindowEvent evt) {
+                formWindowActivated(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
+            }
+        });
 
         javax.swing.GroupLayout dkpContainerLayout = new javax.swing.GroupLayout(dkpContainer);
         dkpContainer.setLayout(dkpContainerLayout);
@@ -110,6 +142,14 @@ public class Principal extends javax.swing.JFrame {
             }
         });
         menuPrincipal.add(menuItemAbrirFecharCaixa);
+
+        menuItemPedidoCaixa.setText("Pedido no Caixa");
+        menuItemPedidoCaixa.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemPedidoCaixaActionPerformed(evt);
+            }
+        });
+        menuPrincipal.add(menuItemPedidoCaixa);
 
         menuItemClientes.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_C, java.awt.event.InputEvent.CTRL_MASK));
         menuItemClientes.setText("Clientes");
@@ -200,6 +240,11 @@ public class Principal extends javax.swing.JFrame {
         menuConfiguracoes.setText("Configurações");
 
         menuItemConfigSistema.setText("Configurações do Sistema");
+        menuItemConfigSistema.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                menuItemConfigSistemaActionPerformed(evt);
+            }
+        });
         menuConfiguracoes.add(menuItemConfigSistema);
 
         menuItemColaoradores.setText("Colaboradores");
@@ -286,6 +331,69 @@ public class Principal extends javax.swing.JFrame {
         alterarSenhaJFrame.setLocationRelativeTo(this);
     }//GEN-LAST:event_menuItemAltararSenhaActionPerformed
 
+    private void menuItemPedidoCaixaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemPedidoCaixaActionPerformed
+        PedidoCaixaJFrame pedidoCaixaJFrame = new PedidoCaixaJFrame();
+        pedidoCaixaJFrame.setVisible(true);
+        pedidoCaixaJFrame.setLocationRelativeTo(this);
+    }//GEN-LAST:event_menuItemPedidoCaixaActionPerformed
+
+    private void menuItemConfigSistemaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_menuItemConfigSistemaActionPerformed
+        try {
+            IUsuarioDAO usuario = new UsuarioDAO();
+            System.err.println(usuario.isFirstUserCreate());
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException | SQLException ex) {
+            java.util.logging.Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_menuItemConfigSistemaActionPerformed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        
+        try {
+            DataBase db = new DataBase();
+            db.initialize();
+            
+            if(this.mUserController.primeiroAdm()){
+                JOptionPane.showMessageDialog(rootPane, "Você precisa cadastrar um usuário administrador para conseguir acessar o sistema");
+                NovoColaboradorJFrame colaboradorJFrame = new NovoColaboradorJFrame();
+                colaboradorJFrame.setVisible(true);
+                colaboradorJFrame.setLocationRelativeTo(this);
+                colaboradorJFrame.addWindowListener(new WindowListener() {
+                    @Override
+                    public void windowOpened(WindowEvent e) {}
+                    @Override
+                    public void windowClosing(WindowEvent e) {}
+                    
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        log.info("Primeiro usuário administrador não cadastrado");
+                        System.exit(0);
+                    }
+                    
+                    @Override
+                    public void windowIconified(WindowEvent e) {}
+                    @Override
+                    public void windowDeiconified(WindowEvent e) {}
+                    @Override
+                    public void windowActivated(WindowEvent e) {}
+                    @Override
+                    public void windowDeactivated(WindowEvent e) {}
+                });
+            }
+        } catch (ClassNotFoundException ex) {
+            java.util.logging.Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InstantiationException ex) {
+            java.util.logging.Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (IllegalAccessException ex) {
+            java.util.logging.Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (SQLException ex) {
+            java.util.logging.Logger.getLogger(Principal.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_formWindowOpened
+
+    private void formWindowActivated(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowActivated
+        // TODO add your handling code here:
+    }//GEN-LAST:event_formWindowActivated
+
     /**
      * @param args the command line arguments
      */
@@ -339,6 +447,7 @@ public class Principal extends javax.swing.JFrame {
     private javax.swing.JMenuItem menuItemHistoricoEntradaSaida;
     private javax.swing.JMenuItem menuItemHistoricoItensVendidos;
     private javax.swing.JMenuItem menuItemHistoricoPedidos;
+    private javax.swing.JMenuItem menuItemPedidoCaixa;
     private javax.swing.JMenuItem menuItemProdutos;
     private javax.swing.JMenuItem menuItemSair;
     private javax.swing.JMenuBar menuOptions;
